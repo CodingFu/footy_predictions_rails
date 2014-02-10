@@ -21,7 +21,7 @@ class PredictionsController < ApplicationController
         err_hash[key] = @prediction.errors[key] if @prediction.errors[key].any?
       end
     end
-    render json: {errors: err_hash, is_valid: @prediction.valid?, url: "#{predictions_path}/#{@prediction.id}"}
+    render json: {errors: err_hash, is_valid: @prediction.errors.empty?, url: "#{predictions_path}/#{@prediction.id}"}
   end
 
   def update
@@ -33,12 +33,13 @@ class PredictionsController < ApplicationController
       # require 'pry'
       # binding.pry
       @prediction.user.use_double_credit if @prediction.double && !current_double_status
+      @prediction.user.refund_credit if !@prediction.double && current_double_status
     else
       [:home_prediction, :away_prediction, :first_goalscorer, :double].each do |key|
         err_hash[key] = @prediction.errors[key] if @prediction.errors[key].any?
       end
     end
-    render json: {errors: err_hash, is_valid: @prediction.valid?, url: "#{predictions_path}/#{@prediction.id}"}
+    render json: {errors: err_hash, is_valid: @prediction.errors.empty?, url: "#{predictions_path}/#{@prediction.id}"}
   end
 
   def show

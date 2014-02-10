@@ -77,4 +77,8 @@ class User < ActiveRecord::Base
     self.credits_received += 1
   end
 
+  def refund_credit
+    self.double_credits += 1
+    save
+  end
 end
